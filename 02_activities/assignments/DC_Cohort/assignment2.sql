@@ -44,10 +44,10 @@ HINT: One of these approaches uses ROW_NUMBER() and one uses DENSE_RANK().
 Filter the visits to dates before April 29, 2022. */
 --QUERY 2
 SELECT customer_id, market_date,
-ROW_NUMBER() OVER (PARTITION BY customer_id) AS visit
+DENSE_RANK() OVER (PARTITION BY customer_id ORDER BY market_date) AS visit
 FROM customer_purchases
 WHERE market_date < '2022-04-29'
-ORDER BY customer_id
+ORDER BY customer_id, market_date
 
 
 --END QUERY
@@ -58,14 +58,12 @@ then write another query that uses this one as a subquery (or temp table) and fi
 only the customer’s most recent visit.
 HINT: Do not use the previous visit dates filter. */
 --QUERY 3
-SELECT customer_id, market_date,
-FROM (
-SELECT customer_id, market_date,
-ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY market_date DESC) AS visit
-FROM customer_purchases
-ORDER BY customer_id )
-
+SELECT DISTINCT customer_id, market_date
+FROM ( SELECT customer_id, market_date,
+DENSE_RANK() OVER (PARTITION BY customer_id ORDER BY market_date DESC) AS visit
+FROM customer_purchases ) AS sub
 WHERE visit = 1
+ORDER BY customer_id
 
 
 
@@ -84,7 +82,7 @@ Filter the visits to dates before April 29, 2022. */
 SELECT product_id, customer_id,
 COUNT(product_id)
 FROM customer_purchases
-WHERE market_date > '2022-03-29'
+WHERE market_date < '2022-04-29'
 GROUP BY product_id, customer_id
 
 
@@ -106,10 +104,11 @@ Hint: you might need to use INSTR(product_name,'-') to find the hyphens. INSTR w
 --QUERY 5
 SELECT product_name,
 CASE
-	WHEN INSTR(product_name, '-') <> 0 THEN 'yes'
+	WHEN INSTR(product_name, '-') > 0 THEN TRIM (SUBSTR(product_name, INSTR(product_name, '-')+1))
 	ELSE NULL
-END AS hyphen_indicator	
+END AS description
 FROM product;
+
 
 
 
@@ -216,11 +215,13 @@ Name the timestamp column `snapshot_timestamp`. */
 
 DROP TABLE IF EXISTS product_units;
 
-CREATE TEMPORARY TABLE product_units AS
+CREATE TABLE product_units AS
 SELECT *,
 CURRENT_TIMESTAMP AS snapshot_timestamp
 FROM product
 WHERE product_qty_type = 'unit'
+
+
 
 
 --END QUERY
