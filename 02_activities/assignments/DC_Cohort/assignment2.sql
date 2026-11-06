@@ -242,6 +242,7 @@ INSERT INTO product_units VALUES (99, 'Pears', 'medium', 99, 'unit', CURRENT_TIM
 HINT: If you don't specify a WHERE clause, you are going to have a bad time.*/
 --QUERY 11
 
+INSERT INTO product_units VALUES (99, 'Pears', 'medium', 99, 'unit', CURRENT_TIMESTAMP)
 DELETE FROM product_units WHERE product_id = 99
 
 
@@ -266,6 +267,9 @@ Finally, make sure you have a WHERE statement to update the right row,
 	you'll need to use product_units.product_id to refer to the correct row within the product_units table. 
 When you have all of these components, you can run the update statement. */
 --QUERY 12
+
+ALTER TABLE product_units
+ADD current_quantity INT;
 
 UPDATE product_units
 SET current_quantity = COALESCE(current_quantity, '');
