@@ -229,7 +229,7 @@ WHERE product_qty_type = 'unit'
 This can be any product you desire (e.g. add another record for Apple Pie). */
 --QUERY 10
 
-INSERT INTO product_units VALUES (99, 'Pears', 'medium', 99, 'unit', CURRENT_TIMESTAMP)
+INSERT INTO product_units VALUES (7, 'Apple Pie', '10"', 3, 'unit', CURRENT_TIMESTAMP)
 
 
 
@@ -242,8 +242,8 @@ INSERT INTO product_units VALUES (99, 'Pears', 'medium', 99, 'unit', CURRENT_TIM
 HINT: If you don't specify a WHERE clause, you are going to have a bad time.*/
 --QUERY 11
 
-INSERT INTO product_units VALUES (99, 'Pears', 'medium', 99, 'unit', CURRENT_TIMESTAMP)
-DELETE FROM product_units WHERE product_id = 99
+
+DELETE FROM product_units WHERE product_id = 7 AND snapshot_timestamp = '2026-11-06 19:27:29'
 
 
 
