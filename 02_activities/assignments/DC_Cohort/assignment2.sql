@@ -58,11 +58,11 @@ then write another query that uses this one as a subquery (or temp table) and fi
 only the customer’s most recent visit.
 HINT: Do not use the previous visit dates filter. */
 --QUERY 3
-SELECT customer_id, MAX(market_date) AS market_date
-FROM customer_purchases
-GROUP BY customer_id
-ORDER BY customer_id
-
+SELECT * FROM (SELECT cp.*,
+DENSE_RANK() OVER (PARTITION BY customer_id ORDER BY market_date DESC) AS visit
+FROM customer_purchases as cp) as x
+WHERE x.visit = 1
+ORDER BY customer_id, market_date
 
 
 
