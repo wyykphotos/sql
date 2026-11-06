@@ -276,18 +276,10 @@ ALTER TABLE product_units
 ADD current_quantity INT;
 
 UPDATE product_units
-SET current_quantity = COALESCE(current_quantity, '');
+SET current_quantity = COALESCE (( SELECT vendor_inventory.quantity FROM vendor_inventory WHERE vendor_inventory.product_id = product_units.product_id
+ORDER BY vendor_inventory.market_date DESC
 
-UPDATE product_units
-SET current_quantity = v.quantity 
-
-FROM 
-( SELECT market_date, quantity, product_id, vendor_id 
-FROM vendor_inventory 
-GROUP BY product_id 
-ORDER BY market_date DESC) AS v
-
-WHERE v.product_id = product_units.product_id;
+LIMIT 1), 0)
 
 
 --END QUERY
