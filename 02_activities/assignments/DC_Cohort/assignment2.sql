@@ -243,7 +243,11 @@ HINT: If you don't specify a WHERE clause, you are going to have a bad time.*/
 --QUERY 11
 
 
-DELETE FROM product_units WHERE product_id = 7 AND snapshot_timestamp = '2026-11-06 19:27:29'
+WITH deletion_record AS (
+SELECT product_id, MIN(snapshot_timestamp) AS snapshot_timestamp
+FROM product_units
+WHERE product_id = 7)
+DELETE FROM product_units WHERE product_id = 7 AND snapshot_timestamp = (SELECT snapshot_timestamp FROM deletion_record)
 
 
 
